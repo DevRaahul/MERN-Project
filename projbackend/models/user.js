@@ -1,37 +1,35 @@
-const mongoose = require("mongoose");
+var mongoose = require("mongoose");
 const crypto = require("crypto");
 const uuidv1 = require("uuid/v1");
 
-const userSchema = new mongoose.Schema(
+var userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
-      maxLength: 32,
+      maxlength: 32,
       trim: true,
     },
-    lastName: {
+    lastname: {
       type: String,
-      required: false,
-      maxLength: 32,
+      maxlength: 32,
       trim: true,
     },
     email: {
       type: String,
-      required: false,
-      uniq: true,
       trim: true,
+      required: true,
+      unique: true,
     },
-    userInfo: {
+    userinfo: {
       type: String,
       trim: true,
     },
     encry_password: {
       type: String,
-      required: true,
     },
     salt: String,
-    roles: {
+    role: {
       type: Number,
       default: 0,
     },
@@ -54,17 +52,18 @@ userSchema
     return this._password;
   });
 
-userSchema.method = {
-  securePassword: function (plainPassword) {
-    if (!plainPassword) return;
+userSchema.methods = {
+  autheticate: function (plainpassword) {
+    return this.securePassword(plainpassword) === this.encry_password;
+  },
+
+  securePassword: function (plainpassword) {
+    if (!plainpassword) return "";
     try {
-      return crypto.createHmac("sha256", this.salt).update(plainPassword).digest("hex");
+      return crypto.createHmac("sha256", this.salt).update(plainpassword).digest("hex");
     } catch (err) {
       return "";
     }
-  },
-  authenticate: function (plainPassword) {
-    return this.securePassword(plainPassword) === this.encry_password;
   },
 };
 
