@@ -1,5 +1,5 @@
 const express = require("express");
-const { signOut, signUp } = require("../controllers/auth");
+const { signOut, signUp, signIn } = require("../controllers/auth");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 
@@ -13,4 +13,5 @@ router.post(
   ],
   signUp
 );
+router.post("/signIn", [check("email", "Invalid email").isEmail(), check("password", "Password field is required").isLength({ min: 3 })], signIn);
 module.exports = router;
