@@ -41,7 +41,12 @@ exports.signIn = (req, res) => {
 
   User.findOne({ email }, (err, user) => {
     if (err) {
-      res.status(400).json({
+      return res.status(400).json({
+        error: "Unable to find user details",
+      });
+    }
+    if (!user) {
+      return res.status(400).json({
         error: "User email not found",
       });
     }
@@ -50,6 +55,7 @@ exports.signIn = (req, res) => {
         error: "Email and password does not match",
       });
     }
+
     const token = jwt.sign({ _id: user?.id }, process.env.SECRET);
     //add token in cookie
     res.cookie("token", token, { expire: new Date() + 9999 });
@@ -68,4 +74,7 @@ exports.signIn = (req, res) => {
   });
 };
 
-exports.signOut = (req, res) => res.json({ msg: "sign out route" });
+exports.signOut = (req, res) => {
+  res.clearCokkie("token");
+  return res.json({ msg: "User log out successfully." });
+};
